@@ -3,6 +3,7 @@ import { StyleSheet, Text, View, TouchableOpacity } from 'react-native';
 import { useState, useEffect } from 'react';
 
 export default function App() {
+  const API_URL = 'https://edda-nonvaried-dominatingly.ngrok-free.dev';
   //intended duration of the current sesh in secs
   const [sessionDuration, setSessionDuration] = useState(25 * 60);
   //stores the current remaining time and decreases every sec while the timer is running
@@ -11,6 +12,7 @@ export default function App() {
   const [isRunning, setIsRunning] = useState(false);
   //adds a session time every time user pauses timer
   const [sessions, setSessions] = useState([]);
+  const [pauseCount, setPauseCount] = useState(0);
 
   const minutes = Math.floor(secondsLeft / 60);
   const seconds = secondsLeft % 60;
@@ -31,9 +33,25 @@ export default function App() {
     return () => clearInterval(interval);
   }, [isRunning]);
 
-  const handleStartPause = () => {
+  const handleStartPause = async () => {
+    console.log('handleStartPause called, isRunning:', isRunning);
     if (isRunning) {
+      setPauseCount(pauseCount+1)
       const elapsed = sessionDuration - secondsLeft;
+      try {
+        await fetch(`${API_URL}/sessions`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            duration: elapsed,
+            pauses: pauseCount
+          })
+        });
+      } catch (error) {
+        console.log('Fetch error:', error);
+      }
+      const data = await response.json();
+      console.log('Response:', data);
       setSessions(prev => [...prev, elapsed]);
     }
     setIsRunning(!isRunning);
