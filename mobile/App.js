@@ -3,6 +3,7 @@ import { StyleSheet, Text, View, TouchableOpacity } from 'react-native';
 import { useState, useEffect } from 'react';
 
 export default function App() {
+  const [sessionDuration, setSessionDuration] = useState(25 * 60);
   const [secondsLeft, setSecondsLeft] = useState(25 * 60);
   const [isRunning, setIsRunning] = useState(false);
   const [sessions, setSessions] = useState([]);
@@ -28,23 +29,86 @@ export default function App() {
 
   const handleStartPause = () => {
     if (isRunning) {
-      const elapsed = 25 * 60 - secondsLeft;
+      const elapsed = sessionDuration - secondsLeft;
       setSessions(prev => [...prev, elapsed]);
     }
     setIsRunning(!isRunning);
   };
 
   const handleReset = () => {
-    setSecondsLeft(25 * 60);
+    setSecondsLeft(sessionDuration);
+    setIsRunning(false);
+  };
+
+  const handleDurationChange = (durationInMinutes) => {
+    if (isRunning) return;
+
+    const newDurationInSeconds = durationInMinutes * 60;
+    setSessionDuration(newDurationInSeconds);
+    setSecondsLeft(newDurationInSeconds);
     setIsRunning(false);
   };
 
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Attune</Text>
+
       <Text style={styles.timer}>
         {minutes}:{seconds < 10 ? '0' : ''}{seconds}
       </Text>
+
+      <View style={styles.presetsContainer}>
+        <TouchableOpacity
+          style={[
+            styles.presetButton,
+            sessionDuration === 15 * 60 && styles.activePresetButton,
+          ]}
+          onPress={() => handleDurationChange(15)}
+        >
+          <Text
+            style={[
+              styles.presetButtonText,
+              sessionDuration === 15 * 60 && styles.activePresetButtonText,
+            ]}
+          >
+            15 min
+          </Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={[
+            styles.presetButton,
+            sessionDuration === 25 * 60 && styles.activePresetButton,
+          ]}
+          onPress={() => handleDurationChange(25)}
+        >
+          <Text
+            style={[
+              styles.presetButtonText,
+              sessionDuration === 25 * 60 && styles.activePresetButtonText,
+            ]}
+          >
+            25 min
+          </Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={[
+            styles.presetButton,
+            sessionDuration === 45 * 60 && styles.activePresetButton,
+          ]}
+          onPress={() => handleDurationChange(45)}
+        >
+          <Text
+            style={[
+              styles.presetButtonText,
+              sessionDuration === 45 * 60 && styles.activePresetButtonText,
+            ]}
+          >
+            45 min
+          </Text>
+        </TouchableOpacity>
+      </View>
 
       <TouchableOpacity style={styles.button} onPress={handleStartPause}>
         <Text style={styles.buttonText}>{isRunning ? 'Pause' : 'Start'}</Text>
@@ -90,7 +154,28 @@ const styles = StyleSheet.create({
     fontSize: 72,
     fontWeight: '200',
     color: '#ffffff',
-    marginBottom: 60,
+    marginBottom: 30,
+  },
+  presetsContainer: {
+    flexDirection: 'row',
+    marginBottom: 30,
+    gap: 10,
+  },
+  presetButton: {
+    backgroundColor: '#7a1a1a',
+    paddingHorizontal: 18,
+    paddingVertical: 10,
+    borderRadius: 20,
+  },
+  presetButtonText: {
+    color: '#ffffff',
+    fontWeight: 'bold',
+  },
+  activePresetButton: {
+    backgroundColor: '#ffffff',
+  },
+  activePresetButtonText: {
+    color: '#520000',
   },
   button: {
     backgroundColor: '#ffffff',
