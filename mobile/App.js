@@ -3,9 +3,13 @@ import { StyleSheet, Text, View, TouchableOpacity } from 'react-native';
 import { useState, useEffect } from 'react';
 
 export default function App() {
+  //intended duration of the current sesh in secs
   const [sessionDuration, setSessionDuration] = useState(25 * 60);
+  //stores the current remaining time and decreases every sec while the timer is running
   const [secondsLeft, setSecondsLeft] = useState(25 * 60);
+  //boolean to keep track of when timer is running/paused
   const [isRunning, setIsRunning] = useState(false);
+  //adds a session time every time user pauses timer
   const [sessions, setSessions] = useState([]);
 
   const minutes = Math.floor(secondsLeft / 60);
